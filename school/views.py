@@ -1,4 +1,4 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 
 # Create your views here.
@@ -49,7 +49,6 @@ class StudentAddView(View):
         if form.is_valid():
             data = form.cleaned_data
             data['school_class'] = school_class
-
             Student.objects.create(**data)
 
         return HttpResponseRedirect(reverse('student_list'))
