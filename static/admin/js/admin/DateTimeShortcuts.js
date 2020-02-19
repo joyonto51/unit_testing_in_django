@@ -375,7 +375,7 @@
             else {
                 // since style's width is in em, it'd be tough to calculate
                 // px value of it. let's use an estimated px for now
-                /
+
                 cal_box.style.left = findPosX(cal_link) - 180 + 'px';
             }
             cal_box.style.top = Math.max(0, findPosY(cal_link) - 75) + 'px';
