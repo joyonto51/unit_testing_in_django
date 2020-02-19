@@ -13,3 +13,5 @@ htmlcov
 htmlcov/*
 
 db.sqlite3
+staticfiles
+staticfiles/*

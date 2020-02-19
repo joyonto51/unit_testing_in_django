@@ -8,6 +8,9 @@ class SchoolClass(models.Model):
     def __str__(self):
         return self.class_name
 
+    class Meta:
+        verbose_name_plural = "School Classes"
+
 class Student(models.Model):
     school_class = models.ForeignKey(SchoolClass, on_delete=models.CASCADE, related_name='students')
 

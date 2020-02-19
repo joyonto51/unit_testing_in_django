@@ -74,6 +74,7 @@ class StudentListView(View):
 
 
 class StudentAddAPIView(APIView):
+
     def get(self, request):
         data = {
             'message':'API is Okay',

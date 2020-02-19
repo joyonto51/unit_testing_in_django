@@ -1,10 +1,11 @@
+from django.contrib.auth.models import User
 from django.test import TestCase, Client, LiveServerTestCase
 from django.urls import reverse
 
 from selenium import webdriver
 from webdriver_manager.firefox import GeckoDriverManager
 
-from school.models import Student
+from school.models import Student, SchoolClass
 
 
 class StudentListViewTest(TestCase):
@@ -42,26 +43,68 @@ class TestStudentAddView(TestCase):
         self.assertEqual(student.roll, 34)
         self.assertEqual(student.address, 'Dinajpur')
 
+
 class TestStudentAddViewBySelenium(LiveServerTestCase):
 
     def setUp(self):
-        # binary = FirefoxBinary('path/to/installed firefox binary')
-        # self.driver = webdriver.Firefox()
+        # create class
+        SchoolClass.objects.create(class_name="one", numeric_value=1)
+        SchoolClass.objects.create(class_name="Two", numeric_value=2)
+
+        # student add urls
         self.student_add_url = self.live_server_url + reverse('student_add')
         self.student_list_url = self.live_server_url + reverse('student_list')
 
-        self.driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        # initializing browser
+        self.browser = webdriver.Firefox()
 
     def test_student_creation_form(self):
-        self.driver.get(self.student_add_url)
+        self.browser.get(self.student_add_url)
 
-        self.driver.find_element_by_name('class_id').send_keys('')
-        self.driver.find_element_by_name('name').send_keys("test student")
-        self.driver.find_element_by_name('roll').send_keys(1)
-        self.driver.find_element_by_name('address').send_keys("test address")
+        class_select_field = self.browser.find_element_by_name("class_id")
 
-        self.driver.find_element_by_id("submit").click()
-        self.assertEqual(self.student_list_url, self.driver.current_url)
+        # for option in class_select_field.find_elements_by_tag_name('option'):
+        #     if option.text == 'Two':
+        #         option.click()
+
+        self.browser.find_element_by_xpath("//select[@name='class_id']/option[text()='Two']").click()
+
+        self.browser.find_element_by_name('name').send_keys("test student")
+        self.browser.find_element_by_name('roll').send_keys(1)
+        self.browser.find_element_by_name('address').send_keys("test address")
+
+        self.browser.find_element_by_id("submit").click()
+        self.assertEqual(self.student_list_url, self.browser.current_url)
 
     def tearDown(self) -> None:
-        self.driver.quit()
+        self.browser.quit()
+
+
+from selenium.webdriver.common.keys import Keys as KEY
+
+
+class TestAdmin(LiveServerTestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_superuser(username='admin', email='admin@gmail.com', password='admin123')
+
+        self.browser = webdriver.Firefox()
+        self.url = self.live_server_url + '/admin/'
+
+    def test_admin_panel(self):
+        self.browser.get(self.url)
+
+        username = self.browser.find_element_by_name('username')
+        password = self.browser.find_element_by_name('password')
+
+        username.send_keys('admin')
+        password.send_keys("admin123")
+        password.send_keys(KEY.RETURN)
+
+        self.browser.find_element_by_name('submit').click()
+
+        self.assertEqual(self.url, self.browser.current_url)
+
+    def tearDown(self):
+        self.browser.quit()
+        self.user.delete()

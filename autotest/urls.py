@@ -16,7 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+# from school.admin import school_admin_site
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # path('school-admin/', school_admin_site.urls),
     path('sample-crud/', include('school.urls')),
 ]
